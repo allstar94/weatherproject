@@ -1,49 +1,53 @@
-import {StatusBar} from 'expo-status-bar';
+import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import {Alert} from "react-native";
+import { Alert } from "react-native";
 import Loading from "./Loading";
 import * as Location from 'expo-location';
 import axios from "axios";
 import Weather from './Weather';
 
-const API_KEY ="a4ebc913ef8067572276874162bbab8b";
+const API_KEY = "a4ebc913ef8067572276874162bbab8b";
 
 export default class extends React.Component {
   state = {
-    isLoading:true
+    isLoading: true
   };
-  getWeather = async(latitude, longitude) =>{
-    const{
+  getWeather = async (latitude, longitude) => {
+    const {
       data: {
-        main:{temp},
+        main: { temp },
         weather
       }
     } = await axios.get(
       `http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`
     );
+    
     this.setState({
-      isLoading:false,
+      isLoading: false,
       condition: weather[0].main,
       temp
-    });  
+    });
+    console.log(weather);
   };
-  getLocation = async() => {
-    try{
+  getLocation = async () => {
+    try {
       await Location.requestPermissionsAsync();
       const {
-        coords:{latitude, longitude}
+        coords: { latitude, longitude }
       } = await Location.getCurrentPositionAsync();
       this.getWeather(latitude, longitude)
       // this.setState({isLoading:false}); 
-    }catch(error){
-        Alert.alert("can't find you.", "so sad");
-    }  
+    } catch (error) {
+      Alert.alert("can't find you.", "so sad");
+    }
   };
-  componentDidMount(){
-    this.getLocation(); 
+
+  componentDidMount() {
+    this.getLocation();
+    
   }
-  render(){
-    const{ isLoading, temp, condition } = this.state;
-    return isLoading?<Loading/> : <Weather temp={Math.round(temp)} condition={condition} />;
+  render() {
+    const { isLoading, temp, condition } = this.state;
+    return isLoading ? <Loading /> : <Weather temp={Math.round(temp)} condition={condition} />;
   }
 }
